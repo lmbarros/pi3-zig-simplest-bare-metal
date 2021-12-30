@@ -30,3 +30,8 @@ dump-elf: all
 
 dump: all
 	arm-none-eabi-objdump -D -b binary -D kernel7.img -m arm
+
+
+# Remove all generated stuff.
+clean:
+	rm -rf zig-cache zig-out kernel7.img
