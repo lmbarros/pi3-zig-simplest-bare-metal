@@ -30,7 +30,9 @@ pub fn build(b: *std.build.Builder) !void {
     // I need be sure that the program's entry point is placed at the very start
     // of the binary image. I use a linker script to do that. See `simplest.ld`
     // for details.
-    exe.setLinkerScriptPath("simplest.ld");
+    exe.setLinkerScriptPath(std.build.FileSource{
+        .path = "simplest.ld",
+    });
 
     // This will build the ELF and place it on `zig-out/bin/`.
     exe.install();
