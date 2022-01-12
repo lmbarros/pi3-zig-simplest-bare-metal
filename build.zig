@@ -64,6 +64,13 @@ pub fn build(b: *std.build.Builder) !void {
         .path = "simplest.ld",
     });
 
+    // This says that the ELF executable will be copied to `zig-out/bin/` as
+    // part of the `install` step. The `dump-elf` (defined below) step will need
+    // this. (Not sure I understand this correctly, but here I go: if I omit
+    // this line, the build system can assume that I am not interested in the
+    // executable, so it will not be placed under `zig-out`.)
+    exe.install();
+
     // With `addInstallRaw()` I tell the build system that I want to generate a
     // raw binary image from the ELF executable we generated above. This is the
     // binary the Pi 3 can run. I make this "bin generation step" a dependency
@@ -71,4 +78,36 @@ pub fn build(b: *std.build.Builder) !void {
     // `zig build`.
     const bin = b.addInstallRaw(exe, "kernel7.img", .{});
     b.getInstallStep().dependOn(&bin.step);
+
+    // Here I add a step to disassemble the intermediate ELF executable. Handy
+    // to troubleshoot issues with the  linker script. Note how I say that this
+    // step depends on the `install` step. That's because the command we run
+    // here expects to find the ELF executable at `zig-out/bin/`, and it is the
+    // `install` step that places it there. Run with `zig build dump-elf`.
+    const dumpELFCommand = b.addSystemCommand(&[_][]const u8{
+        "arm-none-eabi-objdump",
+        "-D",
+        "-m",
+        "arm",
+        b.getInstallPath(.{ .custom = "bin" }, exe.out_filename),
+    });
+    dumpELFCommand.step.dependOn(b.getInstallStep());
+    const dumpELFStep = b.step("dump-elf", "Disassemble the ELF executable");
+    dumpELFStep.dependOn(&dumpELFCommand.step);
+
+    // As above, but for disassembling the final raw binary image. Use to check
+    // the final result, the code that will actually run on the Raspberry Pi.
+    // Run with `zig build dump-bin`
+    const dumpBinCommand = b.addSystemCommand(&[_][]const u8{
+        "arm-none-eabi-objdump",
+        "-D",
+        "-m",
+        "arm",
+        "-b",
+        "binary",
+        b.getInstallPath(bin.dest_dir, bin.dest_filename),
+    });
+    dumpBinCommand.step.dependOn(&bin.step);
+    const dumpBinStep = b.step("dump-bin", "Disassemble the raw binary image");
+    dumpBinStep.dependOn(&dumpBinCommand.step);
 }

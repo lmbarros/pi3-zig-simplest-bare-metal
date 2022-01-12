@@ -22,11 +22,11 @@ SECTIONS {
 	 * where the image will be loaded to by the Pi 3 bootloader. I think this is
 	 * not necessary in this case, because this information will be lost on the
 	 * final binary image. This 0x8000 address will be available on the ELF
-	 * executable (check with `make dump-elf`), but is gone from the final
-	 * binary image (check with `make dump`). Still, I decided to keep the
-	 * reference to 0x8000 here: at least it works as a sort of documentation,
-	 * reminding me of where this code will be placed in the Pi 3 memory when
-	 * running.
+	 * executable (check with `zig build dump-elf`), but is gone from the final
+	 * binary image (check with `zig build dump-bin`). Still, I decided to keep
+	 * the reference to 0x8000 here: at least it works as a sort of
+	 * documentation, reminding me of where this code will be placed in the
+	 * Pi 3 memory when running.
 	 *
 	 * Also worth noting that I don't understand these things very well. If I
 	 * look at the ELF executable that is created first , `.text.boot` is not
@@ -57,7 +57,7 @@ SECTIONS {
 	 *
 	 * But there's one thing I do here: I discard all sections that I don't want
 	 * but for some reason the compiler generates. I inspected the generated
-	 * ELF found them with `make dump-elf` to find everything I wanted to
+	 * ELF found them with `zig build dump-elf` to find everything I wanted to
 	 * discard.
 	 */
 	/DISCARD/ : {
