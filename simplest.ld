@@ -52,7 +52,17 @@ SECTIONS {
 
 	/*
 	 * It's usual to also include the `.data` section in the linker script, but
-	 * I decided to leave it out, since our program does not define any data,
+	 * I decided to leave it out, since this program does not define any data,
 	 * it's pure executable code.
+	 *
+	 * But there's one thing I do here: I discard all sections that I don't want
+	 * but for some reason the compiler generates. I inspected the generated
+	 * ELF found them with `make dump-elf` to find everything I wanted to
+	 * discard.
 	 */
+	/DISCARD/ : {
+			*(.ARM.*)
+			*(.debug_*)
+			*(.comment)
+	}
 }

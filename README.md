@@ -13,5 +13,5 @@ explaining some of the fundamentals of how to program the Raspberry Pi GPIO.
 
 ## How to run
 
-Build with `make`, copy the resulting `kernel7.img` file to an SD card, along
-with all files under `firmware`.
+Build with `zig build`, copy the resulting `zig-out/bin/kernel7.img` file to an
+SD card, along with all files under `firmware`.
